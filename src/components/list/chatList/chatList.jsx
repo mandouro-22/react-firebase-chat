@@ -10,6 +10,8 @@ export default function ChatList() {
   const [addMode, setAddMode] = useState(false);
   const [search, setSearch] = useState("");
 
+
+
   const { currentUser } = useUserStore();
   const { changeChat, chatId } = useChatStore();
 
@@ -20,18 +22,27 @@ export default function ChatList() {
         const items = res.data().chats;
 
         const promises = items.map(async (item) => {
+          console.log(item)
           const userDocRef = doc(db, "users", item?.receiverId);
           const userDocSnap = await getDoc(userDocRef);
 
           const user = userDocSnap.data();
-
           return {
             ...item,
             user,
+            unReadCount: item.unReadCount || 0,
           };
         });
 
+        // console.log(items)
+
+
+
+
         const chatData = await Promise.all(promises);
+
+
+
 
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       }
@@ -41,12 +52,19 @@ export default function ChatList() {
 
   const handleSelect = async (chat) => {
     const userChats = chats.map((item) => {
+
       const { user, ...rest } = item;
       return rest;
     });
 
+
     const chatIndex = userChats.findIndex((i) => i.chatId === chat.chatId);
-    userChats[chatIndex].isSeen = true;
+
+    if (chatIndex !== -1) {
+      userChats[chatIndex].isSeen = true;
+      userChats[chatIndex].unReadCount = 0
+    }
+
 
     const userChatRef = doc(db, "userChats", currentUser.id);
 

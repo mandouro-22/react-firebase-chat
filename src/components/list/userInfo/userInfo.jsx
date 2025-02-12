@@ -1,7 +1,11 @@
 import { useUserStore } from "../../../lib/userStore";
 import "./userInfo.css";
+import {useChatStore} from "../../../lib/chatStore.js";
 export default function UserInfo() {
   const { currentUser } = useUserStore();
+  // const {} = useChatStore()
+  //
+  // console.log(user)
 
   return (
     <section className="userInfo">
